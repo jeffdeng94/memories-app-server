@@ -1,8 +1,9 @@
 import jwt from 'jsonwebtoken'
 
-const auth = async (req, res, next) => {
+const auth = async auth => {
   try {
-    const token = req.headers.authorization.split(' ')[1]
+    if (!auth) return null
+    const token = auth.split(' ')[1]
     const isCustomAuth = token.length < 500
 
     let decodedData
@@ -10,16 +11,15 @@ const auth = async (req, res, next) => {
     if (token && isCustomAuth) {
       decodedData = jwt.verify(token, 'test')
 
-      req.userId = decodedData?.id
+      return decodedData?.id
     } else {
       //google token
       decodedData = jwt.decode(token)
-      req.userId = decodedData?.sub
+      return decodedData?.sub
     }
-
-    next()
   } catch (error) {
     console.log(error)
+    return null
   }
 }
 
